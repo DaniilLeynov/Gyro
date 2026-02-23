@@ -190,9 +190,9 @@ void free_ring_segments(Ring_segment ***segments) {
     }
 
     cur = *segments;
-    for (int i = 0; i < SEGMENTS_NUMBERS; i++) 
+    for (int i = 0; i < SEGMENTS_NUMBERS; i++)
         free(cur[i]);
-    
+
     *segments = NULL;
 }
 
