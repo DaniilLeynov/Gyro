@@ -4,12 +4,16 @@
 #include "window_settings.h"
 #include "settings.h"
 
-Vector2 calculate_tarns_to_global_cords(float radius, float angle) {
-    Vector2 vec;
-    vec.x = radius * cos(angle) + SCREEN_WIDTH / 2;
-    vec.y = radius * sin(angle) + SCREEN_HEIGHT / 2;
-    return vec;
-}
+struct Ball {
+    float radius;
+    Color color;
+    // pos contains polar cords {radius-vector relative to center of ring}
+    Vector2 pos;
+    bool shield;
+    float velocity;
+};
+
+static Vector2 calculate_tarns_to_global_cords(float radius, float angle);
 
 Ball *init_ball() {
     Ball *ball;
@@ -29,6 +33,18 @@ Ball *init_ball() {
     return ball;
 };
 
+Vector2 get_ball_pos(Ball const *ball) {
+    if (ball == NULL) return (Vector2) {
+        0.0f, 0.0f
+    };
+    return ball->pos;
+}
+
+float get_ball_radius(Ball const *ball) {
+    if (ball == NULL) return 0.0f;
+    return ball->radius;
+}
+
 int draw_ball(Ball const *ball) {
     if (ball == NULL) return -1;
     DrawCircleV(calculate_tarns_to_global_cords(ball->pos.x, ball->pos.y),
@@ -47,4 +63,11 @@ void free_ball(Ball **ball) {
     if (ball == NULL || *ball == NULL) return;
     free(*ball);
     ball = NULL;
+}
+
+static Vector2 calculate_tarns_to_global_cords(float radius, float angle) {
+    Vector2 vec;
+    vec.x = radius * cos(angle) + SCREEN_WIDTH / 2;
+    vec.y = radius * sin(angle) + SCREEN_HEIGHT / 2;
+    return vec;
 }

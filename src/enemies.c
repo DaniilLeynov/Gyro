@@ -13,6 +13,7 @@ static bool is_enemy_out_of_bound(Enemy const *enemy);
 static int move_enemy(Enemy *enemy);
 static void free_enemy(Enemy **enemy);
 
+
 static Vector2 calculate_enemy_start_pos(Vector2 enemy_size) {
     float x, y;
     Vector2 vec;

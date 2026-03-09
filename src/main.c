@@ -44,7 +44,6 @@ int main(void) {
 #endif
 
     Ring *ring = init_ring();
-    add_segment_to_ring(&ring);
 
     Ball *ball = init_ball();
 
@@ -68,9 +67,11 @@ int main(void) {
         delta_time = GetFrameTime();
         update_enemies(enemies, delta_time);
         rotate_ball(ball, dir);
+        const Vector2 ball_pos = get_ball_pos(ball);
         for (int i = 0; i < enemies->num_of_enemies; i++) {
             Rectangle rect = { enemies->enemies[i]->pos.x, enemies->enemies[i]->pos.y, enemies->enemies[i]->size.x, enemies->enemies[i]->size.y };
-            if (CheckCollisionCircleRec(calculate_tarns_to_global_cords_t(ball->pos.x, ball->pos.y), ball->radius, rect)) {
+            if (CheckCollisionCircleRec(calculate_tarns_to_global_cords_t(ball_pos.x, ball_pos.y),
+                                        get_ball_radius(ball), rect)) {
                 printf("collision %d id=%d \n", count_of_collisin++, enemies->enemies[i]->id);
                 bg_color = RED;
             }
