@@ -66,7 +66,7 @@ int main(void) {
         bg_color = RAYWHITE;
         delta_time = GetFrameTime();
         update_enemies(enemies, delta_time);
-        rotate_ball(ball, dir);
+        rotate_ball(ball, dir, delta_time);
         const Vector2 ball_pos = get_ball_pos(ball);
         for (int i = 0; i < enemies->num_of_enemies; i++) {
             Rectangle rect = { enemies->enemies[i]->pos.x, enemies->enemies[i]->pos.y, enemies->enemies[i]->size.x, enemies->enemies[i]->size.y };

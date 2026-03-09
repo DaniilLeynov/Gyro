@@ -53,9 +53,9 @@ int draw_ball(Ball const *ball) {
     return 0;
 }
 
-int rotate_ball(Ball *ball, int dir) {
+int rotate_ball(Ball *ball, int dir, float delta_time) {
     if (ball == NULL) return -1;
-    ball->pos.y += ball->velocity * (float)dir;
+    ball->pos.y += ball->velocity * (float)dir * delta_time;
     return 0;
 }
 
