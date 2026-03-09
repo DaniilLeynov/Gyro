@@ -9,7 +9,7 @@ Ball *init_ball();
 
 int draw_ball(Ball const* ball);
 //must be contained in update
-int rotate_ball(Ball *ball, int dir);
+int rotate_ball(Ball *ball, int dir, float delta_time);
 
 Vector2 get_ball_pos(Ball const *ball);
 

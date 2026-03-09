@@ -10,7 +10,7 @@ static int draw_enemy(Enemy const *enemy);
 static int setup_move_enemy(Enemy *enemy);
 static int setup_idle_enemy(Enemy *enemy);
 static bool is_enemy_out_of_bound(Enemy const *enemy);
-static int move_enemy(Enemy *enemy);
+static int move_enemy(Enemy *enemy, float delta_time);
 static void free_enemy(Enemy **enemy);
 
 
@@ -90,9 +90,9 @@ static bool is_enemy_out_of_bound(Enemy const *enemy) {
     return false;
 }
 
-static int move_enemy(Enemy *enemy) {
+static int move_enemy(Enemy *enemy, float delta_time) {
     if (enemy == NULL) return -1;
-    enemy->pos.x += enemy->velocity;
+    enemy->pos.x += enemy->velocity * delta_time;
     return 0;
 }
 
@@ -164,7 +164,7 @@ int update_enemies(Enemies *enemies, float delta_time) {
             if (is_enemy_out_of_bound(enemies->enemies[i]))
                 setup_idle_enemy(enemies->enemies[i]);
             else
-                move_enemy(enemies->enemies[i]);
+                move_enemy(enemies->enemies[i], delta_time);
 
         }
     }
