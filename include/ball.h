@@ -3,20 +3,17 @@
 
 #include "raylib.h"
 
-typedef struct Ball {
-    float radius;
-    Color color;
-    // pos contains polar cords {radius-vector relative to center of ring}
-    Vector2 pos;
-    bool shield;
-    float velocity;
-} Ball;
+typedef struct Ball Ball;
 
 Ball *init_ball();
 
 int draw_ball(Ball const* ball);
-
+//must be contained in update
 int rotate_ball(Ball *ball, int dir);
+
+Vector2 get_ball_pos(Ball const *ball);
+
+float get_ball_radius(Ball const *ball);
 
 void free_ball(Ball **ball);
 

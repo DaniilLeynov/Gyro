@@ -5,26 +5,35 @@
 #include "settings.h"
 #include "window_settings.h"
 
-Ring_segment *init_ring_segment() {
-    Ring_segment *ring_seg;
+enum State {
+    ALIVE,
+    MARKED,
+    DESTROYED,
+};
 
-    ring_seg = (Ring_segment *)malloc(sizeof(Ring_segment));
-    if (ring_seg == NULL) {
-        printf("Error: coudnt alloc mem:");
-        return NULL;
-    }
+struct Ring_segment {
+    Color color;
+    float segment_sharpness;
+    float start_angle;
+    float end_angle;
+    State state;
+};
 
-    *ring_seg = (Ring_segment) {
-        .color = DEFAULT_RING_SEG_COLOR,
-        .segment_sharpness = DEFAULT_RING_SEG_SHARP,
-        .start_angle = DEFAULT_RING_SEG_START_ANGLE,
-        .end_angle = DEFAULT_RING_SEG_END_ANGLE,
-        .state = ALIVE
-    };
+struct Ring {
+    int segments_num;
+    Vector2 center;
+    float inner_radius;
+    float outer_radius;
+    Ring_segment **segments;
+    Ring_segment *picked_segment;
+};
 
-    return ring_seg;
-}
-
+static Ring_segment *init_ring_segment();
+static int add_segment_to_ring(Ring **ring);
+static int mark_picked_segment(Ring_segment *picked_segment);
+static int destroy_picked_segment(Ring_segment *picked_segment);
+static int revive_picked_segment(Ring_segment *picked_segment);
+static void free_ring_segments(Ring_segment ***segments);
 
 Ring *init_ring() {
     Ring *ring;
@@ -55,17 +64,58 @@ Ring *init_ring() {
         if (ring->segments[i] == NULL) {
             printf("Error: coudnt alloc mem");
             free_ring_segments(&(ring->segments));
+            free(ring);
             return NULL;
         }
     }
 
+    if (add_segment_to_ring(&ring) < 0) {
+        free_ring_segments(&(ring->segments));
+        free(ring);
+        return NULL;
+    }
     //FIXME MB
-    if (choose_picked_segment(ring) < 0) return NULL;
+    if (choose_picked_segment(ring) < 0) {
+        free_ring_segments(&(ring->segments));
+        free(ring);
+        return NULL;
+    }
 
     return ring;
 }
 
-int add_segment_to_ring(Ring **ring) {
+void free_ring(Ring **ring) {
+    if (ring == NULL || *ring == NULL) {
+        printf("ring is null");
+        return;
+    }
+
+    free_ring_segments(&((*ring)->segments));
+
+    free(*ring);
+}
+
+static Ring_segment *init_ring_segment() {
+    Ring_segment *ring_seg;
+
+    ring_seg = (Ring_segment *)malloc(sizeof(Ring_segment));
+    if (ring_seg == NULL) {
+        printf("Error: coudnt alloc mem:");
+        return NULL;
+    }
+
+    *ring_seg = (Ring_segment) {
+        .color = DEFAULT_RING_SEG_COLOR,
+        .segment_sharpness = DEFAULT_RING_SEG_SHARP,
+        .start_angle = DEFAULT_RING_SEG_START_ANGLE,
+        .end_angle = DEFAULT_RING_SEG_END_ANGLE,
+        .state = ALIVE
+    };
+
+    return ring_seg;
+}
+
+static int add_segment_to_ring(Ring **ring) {
     Ring_segment **cur_seg;
     float seg_len, cur_seg_len;
 
@@ -152,7 +202,7 @@ int change_picked_segment_state(Ring *ring) {
     return 0;
 }
 
-int mark_picked_segment(Ring_segment *picked_segment) {
+static int mark_picked_segment(Ring_segment *picked_segment) {
     if (picked_segment == NULL) return -1;
     picked_segment->state = MARKED;
 
@@ -161,7 +211,7 @@ int mark_picked_segment(Ring_segment *picked_segment) {
     return 0;
 }
 
-int destroy_picked_segment(Ring_segment *picked_segment) {
+static int destroy_picked_segment(Ring_segment *picked_segment) {
     if (picked_segment == NULL) return -1;
 
     picked_segment->state = DESTROYED;
@@ -171,7 +221,7 @@ int destroy_picked_segment(Ring_segment *picked_segment) {
     return 0;
 }
 
-int revive_picked_segment(Ring_segment *picked_segment) {
+static int revive_picked_segment(Ring_segment *picked_segment) {
     if (picked_segment == NULL) return -1;
 
     picked_segment->state = ALIVE;
@@ -181,7 +231,7 @@ int revive_picked_segment(Ring_segment *picked_segment) {
     return 0;
 }
 
-void free_ring_segments(Ring_segment ***segments) {
+static void free_ring_segments(Ring_segment ***segments) {
     Ring_segment **cur;
 
     if (segments == NULL || *segments == NULL || **segments == NULL) {
@@ -195,19 +245,6 @@ void free_ring_segments(Ring_segment ***segments) {
 
     *segments = NULL;
 }
-
-void free_ring(Ring **ring) {
-    if (ring == NULL || *ring == NULL) {
-        printf("ring is null");
-        return;
-    }
-
-    free_ring_segments(&((*ring)->segments));
-
-    free(*ring);
-}
-
-
 
 
 
